@@ -19,6 +19,13 @@ type Column6 = 'A6' | 'B6' | 'C6' | 'D6' | 'E6' | 'F6' | 'G6' | 'H6';
 type Column7 = 'A7' | 'B7' | 'C7' | 'D7' | 'E7' | 'F7' | 'G7' | 'H7';
 type Column8 = 'A8' | 'B8' | 'C8' | 'D8' | 'E8' | 'F8' | 'G8' | 'H8';
 
+export type Direction = {
+  row: number[];
+  col: number[];
+};
+
+export type GameColor = 'black' | 'white';
+
 export type Rows = ARow | BRow | CRow | DRow | ERow | FRow | GRow | HRow;
 export type Columns =
   | Column1
@@ -32,6 +39,11 @@ export type Columns =
 
 export type BoardCell = Rows & Columns;
 
+type BoardData = {
+  position: [number, number];
+  color: GameColor;
+};
+
 export type PieceClass =
   | 'pawn'
   | 'rook'
@@ -43,15 +55,20 @@ export type PieceClass =
 export type PieceArguments = {
   id: string;
   pieceType: PieceClass;
-  color: 'black' | 'white';
+  color: GameColor;
+  direction: Direction;
   position: BoardCell;
 };
+
+export abstract class AbstractPlayer {
+  color: GameColor;
+}
 
 export abstract class AbstractPiece {
   readonly pieceType: PieceClass;
   isPromoted: boolean;
   id: string;
-  color: 'black' | 'white';
+  color: GameColor;
   position: BoardCell;
   positionHistory: BoardCell[];
   availablePosition: BoardCell[];
@@ -59,4 +76,19 @@ export abstract class AbstractPiece {
   setPosition: (position: BoardCell) => void;
   updatePositionHistory: (position: BoardCell) => void;
   abstract calculateAvailablePosition: () => BoardCell[];
+}
+
+export abstract class AbstractBoardCell {
+  readonly cellColor: GameColor;
+  id: BoardCell;
+  position: [number, number];
+  locatedPiece: AbstractPiece | null;
+
+  isEmpty: () => boolean;
+}
+
+export abstract class AbstractBoard {
+  cells: {
+    [key in BoardCell]: AbstractBoardCell;
+  };
 }
